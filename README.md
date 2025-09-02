@@ -3,8 +3,8 @@
 This is a **full-stack CRUD application** for managing customers and their multiple addresses, built with **React (Vite), Node.js (Express.js), and SQLite**.
 The application demonstrates complete CRUD functionality, advanced filtering, and responsive design. It also includes **automated tests** for both backend (Jest + Supertest) and frontend (Vitest + React Testing Library).
 
-- **Live Demo URL:** `https://customer-management-qwipo.vercel.app`
-- **GitHub Repository:** `https://github.com/your-username/qwipo-customer-management`
+- **Live Demo URL:** `customer-management-app-six.vercel.app`
+- **GitHub Repository:** `https://github.com/Kalyanpandaga/customer-management-app`
 
 ---
 
