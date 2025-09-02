@@ -108,12 +108,6 @@ export default function CustomerDetailPage() {
                     key={a.id}
                     className="border-b last:border-0 cursor-pointer hover:bg-gray-50"
                     onClick={(e) => {
-                      // Prevent row click if clicking a button/link
-                      if (
-                        e.target.tagName === "BUTTON" ||
-                        e.target.tagName === "A"
-                      )
-                        return;
                       navigate(`/addresses/${a.id}/edit`);
                     }}
                   >
@@ -121,16 +115,16 @@ export default function CustomerDetailPage() {
                     <td>{a.city}</td>
                     <td>{a.state}</td>
                     <td>{a.pin_code}</td>
-                    <td className="hidden md:table-cell text-center space-x-2">
+                    <td className="md:table-cell text-center space-x-2">
                       <Link
                         to={`/addresses/${a.id}/edit`}
-                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                        className="bg-green-500 hover:bg-green-600 text-white md:py-2 md:px-4 py-1 px-1 rounded"
                         onClick={(e) => e.stopPropagation()}
                       >
                         Edit
                       </Link>
                       <button
-                        className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+                        className="bg-red-500 hover:bg-red-600 text-white md:py-2 md:px-4 py-1 px-1 rounded"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (confirm("Delete this address?"))
