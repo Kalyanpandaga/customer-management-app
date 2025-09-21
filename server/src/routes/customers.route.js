@@ -1,10 +1,4 @@
 import express from "express";
-import validateRequest from "../middlewares/validate.middleware.js";
-import errorMiddleware from "../middlewares/error.middleware.js";
-import {
-  validateCreateCustomerData,
-  validateUpdateCustomerData,
-} from "../validations/customerData.validation.js";
 import {
   createCustomerController,
   getAllCustomersController,
@@ -19,23 +13,17 @@ const router = express.Router();
 
 router.post(
   "/",
-  validateRequest(validateCreateCustomerData),
+
   createCustomerController
 );
 router.get("/", getAllCustomersController);
 router.get("/:customerId", getCustomerByIdController);
-router.put(
-  "/:customerId",
-  validateRequest(validateUpdateCustomerData),
-  updateCustomerController
-);
+router.put("/:customerId", updateCustomerController);
 router.delete("/:customerId", deleteCustomerController);
 router.get("/one-address/list", getCustomersWithOneAddressController);
 router.get(
   "/multiple-address/list",
   getCustomersWithMultipleAddressesController
 );
-
-router.use(errorMiddleware);
 
 export default router;

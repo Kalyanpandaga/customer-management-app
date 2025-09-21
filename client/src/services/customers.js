@@ -7,11 +7,13 @@ export async function listCustomers({
   city = "",
   state = "",
   pinCode = "",
+  search = "",
 }) {
   const params = { page, limit, sort };
   if (city) params.city = city;
   if (state) params.state = state;
   if (pinCode) params.pinCode = pinCode;
+  if (search) params.search = search;
   const { data } = await api.get("/api/customers", { params });
   return data.customers;
 }

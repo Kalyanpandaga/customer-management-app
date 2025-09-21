@@ -1,65 +1,149 @@
 import validator from "validator";
 
+// Enhanced address validation with comprehensive checks
 export function validateCreateAddressData(data) {
+  const errors = [];
   const { customerId, addressDetails, city, state, pinCode } = data;
-  if (!customerId || typeof customerId !== "number") {
-    throw new Error("Customer ID is required and must be a number.");
+
+  // Customer ID validation
+  if (!customerId) {
+    errors.push("Customer ID is required");
+  } else if (!Number.isInteger(Number(customerId)) || Number(customerId) <= 0) {
+    errors.push("Customer ID must be a positive integer");
   }
-  if (
-    !addressDetails ||
-    addressDetails.length < 5 ||
-    addressDetails.length > 100
-  ) {
-    throw new Error(
-      "Address details are required and must be between 5 and 100 characters."
+
+  // Address Details validation
+  if (!addressDetails) {
+    errors.push("Address details are required");
+  } else if (typeof addressDetails !== "string") {
+    errors.push("Address details must be a string");
+  } else if (addressDetails.trim().length < 10) {
+    errors.push("Address details must be at least 10 characters long");
+  } else if (addressDetails.trim().length > 500) {
+    errors.push("Address details must not exceed 500 characters");
+  } else if (!/^[a-zA-Z0-9\s\-\.,#\/]+$/.test(addressDetails.trim())) {
+    errors.push("Address details contain invalid characters");
+  }
+
+  // City validation
+  if (!city) {
+    errors.push("City is required");
+  } else if (typeof city !== "string") {
+    errors.push("City must be a string");
+  } else if (city.trim().length < 2) {
+    errors.push("City must be at least 2 characters long");
+  } else if (city.trim().length > 100) {
+    errors.push("City must not exceed 100 characters");
+  } else if (!/^[a-zA-Z\s\-']+$/.test(city.trim())) {
+    errors.push(
+      "City can only contain letters, spaces, hyphens, and apostrophes"
     );
   }
-  if (!city || city.length < 2 || city.length > 50) {
-    throw new Error(
-      "City is required and must be between 2 and 50 characters."
+
+  // State validation
+  if (!state) {
+    errors.push("State is required");
+  } else if (typeof state !== "string") {
+    errors.push("State must be a string");
+  } else if (state.trim().length < 2) {
+    errors.push("State must be at least 2 characters long");
+  } else if (state.trim().length > 100) {
+    errors.push("State must not exceed 100 characters");
+  } else if (!/^[a-zA-Z\s\-']+$/.test(state.trim())) {
+    errors.push(
+      "State can only contain letters, spaces, hyphens, and apostrophes"
     );
   }
-  if (!state || state.length < 2 || state.length > 50) {
-    throw new Error(
-      "State is required and must be between 2 and 50 characters."
-    );
+
+  // PIN Code validation
+  if (!pinCode) {
+    errors.push("PIN code is required");
+  } else if (typeof pinCode !== "string") {
+    errors.push("PIN code must be a string");
+  } else {
+    const cleanPinCode = pinCode.replace(/\s/g, "");
+    if (!/^\d{4,10}$/.test(cleanPinCode)) {
+      errors.push("PIN code must be 4-10 digits");
+    } else if (!validator.isPostalCode(cleanPinCode, "any")) {
+      errors.push("Please enter a valid PIN code");
+    }
   }
-  if (!pinCode || !validator.isPostalCode(pinCode + "", "IN")) {
-    throw new Error("A valid pin code is required.");
+
+  if (errors.length > 0) {
+    throw new Error(errors.join("; "));
   }
+
+  // Sanitize data
+  return {
+    customerId: Number(customerId),
+    addressDetails: addressDetails.trim(),
+    city: city.trim(),
+    state: state.trim(),
+    pinCode: pinCode.replace(/\s/g, ""),
+  };
 }
 
 export function validateUpdateAddressData(data) {
+  const errors = [];
   const allowedFields = ["addressDetails", "city", "state", "pinCode"];
+  const sanitizedData = {};
+
   for (const field of Object.keys(data)) {
     if (!allowedFields.includes(field)) {
-      throw new Error(`Invalid field: ${field}`);
+      errors.push(`Invalid field: ${field}`);
+      continue;
     }
-    if (
-      field === "addressDetails" &&
-      (data[field].length < 5 || data[field].length > 100)
-    ) {
-      throw new Error(
-        "Address details must be between 5 and 100 characters if provided."
-      );
+
+    const value = data[field];
+    if (value === undefined || value === null) {
+      continue; // Skip undefined/null values
     }
-    if (
-      field === "city" &&
-      (data[field].length < 2 || data[field].length > 50)
-    ) {
-      throw new Error("City must be between 2 and 50 characters if provided.");
-    }
-    if (
-      field === "state" &&
-      (data[field].length < 2 || data[field].length > 50)
-    ) {
-      throw new Error("State must be between 2 and 50 characters if provided.");
-    }
-    if (
-      field === "pinCode" &&
-      !validator.isPostalCode(data[field] + "", "IN")
-    ) {
-      throw new Error("Pin code must be valid if provided.");
+
+    if (field === "addressDetails") {
+      if (typeof value !== "string") {
+        errors.push("Address details must be a string");
+      } else if (value.trim().length < 10) {
+        errors.push("Address details must be at least 10 characters long");
+      } else if (value.trim().length > 500) {
+        errors.push("Address details must not exceed 500 characters");
+      } else if (!/^[a-zA-Z0-9\s\-\.,#\/]+$/.test(value.trim())) {
+        errors.push("Address details contain invalid characters");
+      } else {
+        sanitizedData[field] = value.trim();
+      }
+    } else if (field === "city" || field === "state") {
+      if (typeof value !== "string") {
+        errors.push(`${field} must be a string`);
+      } else if (value.trim().length < 2) {
+        errors.push(`${field} must be at least 2 characters long`);
+      } else if (value.trim().length > 100) {
+        errors.push(`${field} must not exceed 100 characters`);
+      } else if (!/^[a-zA-Z\s\-']+$/.test(value.trim())) {
+        errors.push(
+          `${field} can only contain letters, spaces, hyphens, and apostrophes`
+        );
+      } else {
+        sanitizedData[field] = value.trim();
+      }
+    } else if (field === "pinCode") {
+      if (typeof value !== "string") {
+        errors.push("PIN code must be a string");
+      } else {
+        const cleanPinCode = value.replace(/\s/g, "");
+        if (!/^\d{4,10}$/.test(cleanPinCode)) {
+          errors.push("PIN code must be 4-10 digits");
+        } else if (!validator.isPostalCode(cleanPinCode, "any")) {
+          errors.push("Please enter a valid PIN code");
+        } else {
+          sanitizedData[field] = cleanPinCode;
+        }
+      }
     }
   }
+
+  if (errors.length > 0) {
+    throw new Error(errors.join("; "));
+  }
+
+  return sanitizedData;
 }

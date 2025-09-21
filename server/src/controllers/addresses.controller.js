@@ -6,20 +6,29 @@ import {
   deleteAddressById,
 } from "../services/db.service.js";
 import { errorResponse } from "../utils/errorResponse.js";
+import {
+  validateCreateAddressData,
+  validateUpdateAddressData,
+} from "../validations/addressData.validation.js";
 
 export async function addAddressToCustomerController(req, res, next) {
   try {
     const { customerId } = req.params;
-    const { addressDetails, city, state, pinCode } = req.body;
-    const id = await addAddressToCustomer({
+    const validatedData = validateCreateAddressData({
       customerId: Number(customerId),
-      addressDetails,
-      city,
-      state,
-      pinCode,
+      ...req.body,
     });
+    const id = await addAddressToCustomer(validatedData);
     res.status(201).json({ message: "Address added successfully", id });
   } catch (err) {
+    if (err.message.includes("FOREIGN KEY constraint failed")) {
+      return errorResponse(
+        res,
+        404,
+        "CUSTOMER_NOT_FOUND",
+        "Customer not found"
+      );
+    }
     next(err);
   }
 }
@@ -49,16 +58,13 @@ export async function getAddressByIdController(req, res, next) {
 export async function updateAddressByIdController(req, res, next) {
   try {
     const { addressId } = req.params;
-    const { addressDetails, city, state, pinCode } = req.body;
+    const validatedData = validateUpdateAddressData(req.body);
+
     const address = await getAddressById(Number(addressId));
     if (!address)
-      return errorResponse(res, 404, "ADDRESS_NOT_FOUND", "address not found");
-    await updateAddressById(Number(addressId), {
-      addressDetails,
-      city,
-      state,
-      pinCode,
-    });
+      return errorResponse(res, 404, "ADDRESS_NOT_FOUND", "Address not found");
+
+    await updateAddressById(Number(addressId), validatedData);
     res.json({ message: "Address updated successfully" });
   } catch (err) {
     next(err);

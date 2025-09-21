@@ -44,7 +44,8 @@ export async function getAllCustomers({
   const filters = [];
 
   let sql = `
-    SELECT DISTINCT c.id, c.first_name, c.last_name, c.phone_number 
+    SELECT DISTINCT c.id, c.first_name, c.last_name, c.phone_number,
+           COUNT(a.id) as address_count
     FROM customers c 
     LEFT JOIN addresses a ON c.id = a.customer_id
   `;
@@ -55,13 +56,32 @@ export async function getAllCustomers({
     state: "a.state",
     pinCode: "a.pin_code",
   };
+
   for (const [key, value] of Object.entries(searchParams)) {
     if (allowedFilters[key] && value) {
       filters.push(`${allowedFilters[key]} LIKE ?`);
       params.push(`%${value}%`);
     }
   }
+
+  // Search by name or phone
+  if (searchParams.search) {
+    const searchFilters = [];
+    searchFilters.push(
+      `(c.first_name LIKE ? OR c.last_name LIKE ? OR c.phone_number LIKE ?)`
+    );
+    params.push(
+      `%${searchParams.search}%`,
+      `%${searchParams.search}%`,
+      `%${searchParams.search}%`
+    );
+    filters.push(...searchFilters);
+  }
+
   if (filters.length > 0) sql += " WHERE " + filters.join(" AND ");
+
+  // Group by customer to get address count
+  sql += " GROUP BY c.id, c.first_name, c.last_name, c.phone_number";
 
   // Sorting & Pagination
   sql += ` ORDER BY c.first_name ${
