@@ -72,28 +72,17 @@ export default function CustomerDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Back Button */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/customers")}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft size={16} />
-          Back to Customers
-        </Button>
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
-            <User className="text-blue-600" size={18} />
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
-              {customer.first_name} {customer.last_name}
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-600">
-              Customer ID: {customer.id}
-            </p>
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+          <User className="text-blue-600" size={18} />
+        </div>
+        <div>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+            {customer.first_name} {customer.last_name}
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600">
+            Customer ID: {customer.id}
+          </p>
         </div>
       </div>
 
