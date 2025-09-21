@@ -35,7 +35,7 @@ app.use(rateLimiterMiddleware);
 app.use(requestLoggerMiddleware);
 
 // Health check endpoint
-app.get("/health", (req, res) => {
+app.get("/healthz", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
