@@ -99,53 +99,61 @@ function randomPinCode() {
   return (400000 + Math.floor(Math.random() * 999)).toString();
 }
 
-// Begin the seed
-db.serialize(() => {
-  db.run("DELETE FROM addresses");
-  db.run("DELETE FROM customers");
+export default function seed(db) {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run("DELETE FROM addresses");
+      db.run("DELETE FROM customers");
 
-  let customerAddressMap = {}; // customerId: number of addresses
+      let customerAddressMap = {};
 
-  // Insert 35 customers
-  for (let i = 0; i < 35; i++) {
-    let firstName = firstNames[i % firstNames.length];
-    let lastName = lastNames[i % lastNames.length];
-    let phoneNumber = (9123456700 + i).toString();
+      // Insert 35 customers
+      for (let i = 0; i < 35; i++) {
+        let firstName = firstNames[i % firstNames.length];
+        let lastName = lastNames[i % lastNames.length];
+        let phoneNumber = (9123456700 + i).toString();
 
-    db.run(
-      "INSERT INTO customers (first_name, last_name, phone_number) VALUES (?, ?, ?)",
-      [firstName, lastName, phoneNumber]
-    );
+        db.run(
+          "INSERT INTO customers (first_name, last_name, phone_number) VALUES (?, ?, ?)",
+          [firstName, lastName, phoneNumber]
+        );
 
-    customerAddressMap[i + 1] = 1 + (i % 3); // cyclic: 1,2,3 addresses
-  }
+        customerAddressMap[i + 1] = 1 + (i % 3); // cyclic: 1,2,3 addresses
+      }
 
-  // Insert addresses
-  let addressDetails = [
-    "Flat 101, Green Residency",
-    "Villa 202, Blue Valley",
-    "Office 303, Red Tower",
-    "House 12C, Sunshine Colony",
-    "Apartment 55A, River View",
-    "Unit 6, Tech Park",
-    "Suite 9B, Lake Residency",
-    "Cottage 7, Hill View",
-  ];
+      let addressDetails = [
+        "Flat 101, Green Residency",
+        "Villa 202, Blue Valley",
+        "Office 303, Red Tower",
+        "House 12C, Sunshine Colony",
+        "Apartment 55A, River View",
+        "Unit 6, Tech Park",
+        "Suite 9B, Lake Residency",
+        "Cottage 7, Hill View",
+      ];
 
-  let addressCounter = 0;
-  for (let customerId = 1; customerId <= 35; customerId++) {
-    let addrCount = customerAddressMap[customerId];
-    for (let j = 0; j < addrCount; j++) {
-      let adDetails =
-        addressDetails[(addressCounter + j) % addressDetails.length];
-      db.run(
-        "INSERT INTO addresses (customer_id, address_details, city, state, pin_code) VALUES (?, ?, ?, ?, ?)",
-        [customerId, adDetails, random(cities), random(states), randomPinCode()]
-      );
-    }
-    addressCounter += addrCount;
-  }
+      let addressCounter = 0;
+      for (let customerId = 1; customerId <= 35; customerId++) {
+        let addrCount = customerAddressMap[customerId];
+        for (let j = 0; j < addrCount; j++) {
+          let adDetails =
+            addressDetails[(addressCounter + j) % addressDetails.length];
+          db.run(
+            "INSERT INTO addresses (customer_id, address_details, city, state, pin_code) VALUES (?, ?, ?, ?, ?)",
+            [
+              customerId,
+              adDetails,
+              random(cities),
+              random(states),
+              randomPinCode(),
+            ]
+          );
+        }
+        addressCounter += addrCount;
+      }
 
-  console.log("✅ Seeded 35 customers with 1-3 addresses each.");
-  db.close();
-});
+      console.log("✅ Seeded 35 customers with 1–3 addresses each.");
+      resolve();
+    });
+  });
+}

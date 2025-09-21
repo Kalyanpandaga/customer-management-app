@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import { DATABASE_URL } from "./constants.js";
+import seed from "../../scripts/seed.js";
 
 const db = new sqlite3.Database(DATABASE_URL.replace("sqlite:", ""), (err) => {
   if (err) {
@@ -29,6 +30,15 @@ db.serialize(() => {
       FOREIGN KEY (customer_id) REFERENCES customers(id)
     )
   `);
+
+  db.get("SELECT COUNT(*) as count FROM customers", (err, row) => {
+    if (!err && row.count === 0) {
+      console.log("🌱 Seeding demo data...");
+      seed(db);
+    } else {
+      console.log("✅ Customers already exist, skipping seeding.");
+    }
+  });
 });
 
 export default db;
