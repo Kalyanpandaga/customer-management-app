@@ -14,9 +14,19 @@ import {
   validateSearchParams,
 } from "../validations/customerData.validation.js";
 
+// Helper to check valid integer ID
+function isValidId(id) {
+  return /^\d+$/.test(id) && Number(id) > 0;
+}
+
 export async function createCustomerController(req, res, next) {
   try {
-    const validatedData = validateCreateCustomerData(req.body);
+    let validatedData;
+    try {
+      validatedData = validateCreateCustomerData(req.body);
+    } catch (err) {
+      return errorResponse(res, 400, "VALIDATION_ERROR", err.message);
+    }
     const id = await createCustomer(validatedData);
     res.status(201).json({ message: "Customer created successfully", id });
   } catch (err) {
@@ -34,7 +44,12 @@ export async function createCustomerController(req, res, next) {
 
 export async function getAllCustomersController(req, res, next) {
   try {
-    const validatedParams = validateSearchParams(req.query);
+    let validatedParams;
+    try {
+      validatedParams = validateSearchParams(req.query);
+    } catch (err) {
+      return errorResponse(res, 400, "VALIDATION_ERROR", err.message);
+    }
     const { city, state, pinCode, page, limit, sort, search } = validatedParams;
 
     const searchParams = {};
@@ -58,6 +73,9 @@ export async function getAllCustomersController(req, res, next) {
 export async function getCustomerByIdController(req, res, next) {
   try {
     const { customerId } = req.params;
+    if (!isValidId(customerId)) {
+      return errorResponse(res, 400, "VALIDATION_ERROR", "Invalid customer ID");
+    }
     const customer = await getCustomerById(customerId);
     if (!customer) {
       return errorResponse(
@@ -72,10 +90,19 @@ export async function getCustomerByIdController(req, res, next) {
     next(err);
   }
 }
+
 export async function updateCustomerController(req, res, next) {
   try {
     const { customerId } = req.params;
-    const validatedData = validateUpdateCustomerData(req.body);
+    if (!isValidId(customerId)) {
+      return errorResponse(res, 400, "VALIDATION_ERROR", "Invalid customer ID");
+    }
+    let validatedData;
+    try {
+      validatedData = validateUpdateCustomerData(req.body);
+    } catch (err) {
+      return errorResponse(res, 400, "VALIDATION_ERROR", err.message);
+    }
 
     const customer = await getCustomerById(customerId);
     if (!customer) {
@@ -113,6 +140,9 @@ export async function updateCustomerController(req, res, next) {
 export async function deleteCustomerController(req, res, next) {
   try {
     const { customerId } = req.params;
+    if (!isValidId(customerId)) {
+      return errorResponse(res, 400, "VALIDATION_ERROR", "Invalid customer ID");
+    }
     const customer = await getCustomerById(customerId);
     if (!customer) {
       return errorResponse(

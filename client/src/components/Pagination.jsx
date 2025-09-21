@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "./UI";
 
 export default function Pagination({ page, onPage, hasNext }) {

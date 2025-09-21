@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { getCustomer } from "../services/customers";

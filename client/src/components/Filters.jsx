@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import { Input, Button, Select } from "./UI";
 import { Search, X, Filter } from "lucide-react";

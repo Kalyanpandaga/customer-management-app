@@ -1,14 +1,23 @@
+import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CustomerEditPage from "../CustomerEditPage";
 
+const queryClient = new QueryClient();
+
 describe("CustomerEditPage", () => {
-  it("renders form for editing customer", () => {
+  it("renders edit customer form", async () => {
     render(
-      <MemoryRouter>
-        <CustomerEditPage />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/customers/5/edit"]}>
+          <Routes>
+            <Route path="/customers/:id/edit" element={<CustomerEditPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
-    expect(screen.getByText(/Edit Customer/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Edit Customer/i)).toBeInTheDocument();
   });
 });

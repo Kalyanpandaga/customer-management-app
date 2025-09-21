@@ -1,14 +1,21 @@
+import React from "react";
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AddressCreatePage from "../AddressCreatePage";
 
+const queryClient = new QueryClient();
+
 describe("AddressCreatePage", () => {
-  it("renders create address form", () => {
+  it("renders add address form", () => {
     render(
-      <MemoryRouter>
-        <AddressCreatePage />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <AddressCreatePage />
+        </MemoryRouter>
+      </QueryClientProvider>
     );
-    expect(screen.getByText(/Create Address/i)).toBeInTheDocument();
+    expect(screen.getByText(/Add Address/i)).toBeInTheDocument();
   });
 });

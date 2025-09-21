@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Users, MapPin, Menu, X } from "lucide-react";
