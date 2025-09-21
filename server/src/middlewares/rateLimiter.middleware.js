@@ -5,7 +5,7 @@ export default function rateLimiterMiddleware(req, res, next) {
   const clientId = req.ip || "unknown";
   const now = Date.now();
   const windowMs = 15 * 60 * 1000; // 15 minutes
-  const maxRequests = 100; // Max 100 requests per window
+  const maxRequests = 500; // Max 500 requests per window
 
   if (!requests.has(clientId)) {
     requests.set(clientId, { count: 1, resetTime: now + windowMs });
